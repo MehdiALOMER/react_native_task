@@ -40,6 +40,7 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
           data={productList}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
+          /* onEndReached={getProducts} */
         />
       </GenericView>
     </SafeAreaWrapper>

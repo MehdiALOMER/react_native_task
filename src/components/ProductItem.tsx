@@ -5,6 +5,7 @@ import Icon from './shared/Icons';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { IProduct } from '@/types/dataTypes';
+import { addToCartThunk } from '@/store/reducers';
 
 
 interface Props {
@@ -19,17 +20,19 @@ const ProductItem = ({ product, navigation }: Props) => {
     const dispatch = useDispatch<AppDispatch>();
 
 
-
-    const goDetail = () => {
-        /* dispatch(getDevicesByEmployeeIdThunk(employee.id));
-        navigation.navigate('detail'); */
-
+    const goToProductDetail = (product: IProduct) => {
+        navigation.navigate('ProductDetailScreen', { product });
     }
 
+    const addToCart = (id: number) => {
+        dispatch(addToCartThunk(id));
+    }
     return (
         <GenericView flex={1} backgroundColor={colors.primaryLight} width={dWidth * .45} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
             <GenericView padding={dWidth * .0125}>
-                <GenericTouchableOpacity>
+                <GenericTouchableOpacity
+                    onPress={goToProductDetail.bind(this, product)}
+                >
                     <GenericView flex={1}>
                         <GenericImage source={{ uri: product.image }} resizeMode={"cover"} width={dWidth * .3875} height={dWidth * .4} />
                     </GenericView>
@@ -41,7 +44,10 @@ const ProductItem = ({ product, navigation }: Props) => {
                     </GenericView>
                 </GenericTouchableOpacity>
                 <GenericView >
-                    <GenericTouchableOpacity backgroundColor={colors.primary} padding={dWidth * .025} center borderRadius={5}>
+                    <GenericTouchableOpacity
+                        onPress={addToCart.bind(this, product.id)}
+                        backgroundColor={colors.primary} padding={dWidth * .025} center borderRadius={5}
+                    >
                         <GenericText color={colors.white}>Add to Cart</GenericText>
                     </GenericTouchableOpacity>
                 </GenericView>

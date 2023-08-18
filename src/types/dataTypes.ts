@@ -8,3 +8,8 @@ export interface IProduct {
     "image": string,
     "createdAt": string,
 };
+
+export interface ICart {
+    "product": IProduct,
+    "quantity": number,
+}

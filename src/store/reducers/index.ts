@@ -1,5 +1,5 @@
 import { setLoading } from './loadingReducer';
 import { getProductsThunk } from './productReducer';
-import { setCartCount, setCartData } from './cartReducer';
+import { setCartCount, setCartData, addToCartThunk } from './cartReducer';
 
-export { setLoading, getProductsThunk, setCartCount, setCartData };
+export { setLoading, getProductsThunk, setCartCount, setCartData, addToCartThunk };

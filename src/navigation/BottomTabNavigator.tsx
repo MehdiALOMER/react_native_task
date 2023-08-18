@@ -73,12 +73,12 @@ export default function BottomTabNavigator() {
                             {/* <MaterialCommunityIcons name={"home"} size={35} color={focused == true ? Colors.EKOORANGE : Colors.WHITE} /> */}
                             {/* <Text style={[{ color: focused == true ? colors.black : colors.white, fontWeight: "bold" }]}>CartScreen</Text> */}
                             <Icon name="cart" size={35} color={focused == true ? colors.black : colors.white} />
-                            {
+                           {/*  {
                                 cartCount > 0 &&
                                 <Badge>
                                     <Text style={{ color: colors.white }}>{cartCount}</Text>
                                 </Badge>
-                            }
+                            } */}
 
                         </View>
                     )

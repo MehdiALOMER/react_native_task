@@ -16,17 +16,16 @@ const SafeAreaWrapper = ({ children }: SafeAreaWrapperProps) => {
     const isLoading = useSelector((state: RootState) => state.loadingReducer.isLoading);
 
     useEffect(() => {
-        /* console.log("SafeAreaWrapper", isLoading) */
 
 
 
-        // Geri düğmesi olayını dinlemek için bir olay dinleyici ekleyin
+        /* // Geri düğmesi olayını dinlemek için bir olay dinleyici ekleyin
         BackHandler.addEventListener('hardwareBackPress', handleBackButton)
 
         // Component sonlandığında olay dinleyicisini kaldırın
         return () => {
             BackHandler.removeEventListener('hardwareBackPress', handleBackButton)
-        }
+        } */
 
     }, [])
 
