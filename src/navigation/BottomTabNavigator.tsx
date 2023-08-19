@@ -23,9 +23,9 @@ export default function BottomTabNavigator() {
             initialRouteName="HomeScreen"
             labeled={false}
             barStyle={{
-                backgroundColor: colors.primaryLight,
-                borderTopWidth: 2,
-                borderTopColor: colors.primary
+                backgroundColor: colors.primary,
+               /*  borderTopWidth: 2,
+                borderTopColor: colors.primary */
             }}
             screenOptions={{
 
@@ -37,7 +37,7 @@ export default function BottomTabNavigator() {
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <GenericView>
-                            <Icon name="home" size={35} color={focused == true ? colors.primary : colors.white} />
+                            <Icon name="home" size={35} color={focused == true ? colors.white : colors.gray} />
                         </GenericView>
                     )
                 }}
@@ -49,7 +49,7 @@ export default function BottomTabNavigator() {
                     tabBarBadge: cartCount > 0 ? cartCount : false,
                     tabBarIcon: ({ focused }) => (
                         <GenericView>
-                            <Icon name="cart" size={35} color={focused == true ? colors.black : colors.white} />
+                            <Icon name="cart" size={35} color={focused == true ? colors.white : colors.gray}  />
                             {/* {
                                 cartCount > 0 &&
                                 <Badge

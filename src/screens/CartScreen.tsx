@@ -24,20 +24,35 @@ const CartScreen: React.FC = ({ navigation }: any) => {
 
     return (
         <SafeAreaWrapper>
-            <AppHeader /* title="Cart" */ title={cartTotalPrice} />
+            <AppHeader title="Cart" />
             <GenericView flex={1}>
 
                 {
                     cartData.length !== 0 ?
-                        <FlatList
-                            data={cartData}
-                            renderItem={renderItem}
-                            keyExtractor={(item) => item.id.toString()}
-                        /* ListFooterComponent={
-                            <GenericView height={dHeight * .4} />
-
-                        } */
-                        />
+                        <GenericView flex={1}>
+                            <GenericView flex={7}>
+                                <FlatList
+                                    data={cartData}
+                                    renderItem={renderItem}
+                                    keyExtractor={(item) => item.id.toString()}
+                                />
+                            </GenericView>
+                            <GenericView flex={1} padding={dWidth * .02} spaceBetween>
+                                <GenericView flexDirection='row' spaceBetween>
+                                    <GenericView>
+                                        <GenericText bold fontSize={16}>Total:</GenericText>
+                                    </GenericView><GenericView>
+                                        <GenericText bold fontSize={16} color={colors.primary}>{cartTotalPrice} ₺</GenericText>
+                                    </GenericView>
+                                </GenericView>
+                                <GenericTouchableOpacity
+                                    onPress={() => { }}
+                                    backgroundColor={colors.primary} borderRadius={5} center padding={dWidth * .02}
+                                >
+                                    <GenericText color={colors.white} bold>Complete</GenericText>
+                                </GenericTouchableOpacity>
+                            </GenericView>
+                        </GenericView>
                         :
                         <GenericView flex={1} center>
                             <GenericView>

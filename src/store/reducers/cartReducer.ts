@@ -77,11 +77,10 @@ const cartSlice = createSlice({
         cartTotalPrice: 0 as number
     },
     reducers: {
-        setCartCount: (state, action) => {
-            state.cartCount = action.payload;
-        },
         setCartData: (state, action) => {
             state.cartData = action.payload;
+            state.cartCount = action.payload.length;
+            state.cartTotalPrice = action.payload.reduce((acc: any, item: IGenericProduct) => acc + (item.price * item.quantity), 0);
         }
     },
     extraReducers: (builder) => {
@@ -107,6 +106,6 @@ const cartSlice = createSlice({
 
 export { addToCartThunk, increaseAndDecreaseQuantityThunk, deleteFromCartThunk };
 
-export const { setCartCount, setCartData } = cartSlice.actions;
+export const { setCartData } = cartSlice.actions;
 
 export default cartSlice.reducer;

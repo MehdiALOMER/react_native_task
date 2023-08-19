@@ -4,26 +4,42 @@ import SafeAreaWrapper from '@/components/shared/SafeAreaWrapper';
 import { GenericText } from '@/assets/css';
 import AppHeader from '@/components/shared/AppHeader';
 import { StorageService } from '@/utils/storage';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { getProductsThunk, setCartData } from '@/store/reducers';
 
 
 const StarterScreen: React.FC = ({ navigation }: any) => {
 
+    const dispatch = useDispatch<AppDispatch>();
+
     useEffect(() => {
+        getProducts();
         checkCartData();
     }, []);
+    const getProducts = () => {
+        dispatch(getProductsThunk());
+    };
+
     const checkCartData = async () => {
-        const cartData = await StorageService.getItem('cartData');
-        console.log('cartData ::::::::: ', cartData);
+
 
         navigation.navigate('BottomTabNavigator', { screen: 'HomeScreen' });
 
-        StorageService.removeItem('cartData');
+        let cartData = await StorageService.getItem('cartData');
+        if (cartData) {
+            let data = JSON.parse(cartData);
+            dispatch(setCartData(data));
+        }
+
+
+        /* StorageService.removeItem('cartData'); */
     }
 
 
     return (
         <SafeAreaWrapper>
-            <AppHeader title="Cart" />
+            <AppHeader title="StarterScreen" />
             <GenericText>StarterScreen</GenericText>
         </SafeAreaWrapper>
     );

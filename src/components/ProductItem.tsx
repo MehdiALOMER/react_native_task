@@ -5,7 +5,7 @@ import Icon from './shared/Icons';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { IGenericProduct } from '@/types/dataTypes';
-import { addToCartThunk } from '@/store/reducers';
+import { addAndRemoveFavoriteThunk, addToCartThunk } from '@/store/reducers';
 
 
 interface Props {
@@ -27,17 +27,28 @@ const ProductItem = ({ product, navigation }: Props) => {
     const addToCart = (id: number) => {
         dispatch(addToCartThunk(id));
     }
+    const addAndRemoveFavorite = (id: number) => {
+        dispatch(addAndRemoveFavoriteThunk(id));
+    }
     return (
-        <GenericView flex={1} backgroundColor={colors.primaryLight} width={dWidth * .45} height={dWidth * .6} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
+        <GenericView backgroundColor={colors.primaryLight} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
             <GenericView padding={dWidth * .0125}>
                 <GenericTouchableOpacity
                     onPress={goToProductDetail.bind(this, product)}
                 >
-                    <GenericView flex={1}>
-                        <GenericImage source={{ uri: product.image }} resizeMode={"cover"} width={dWidth * .3875} height={dWidth * .4} />
+                    <GenericView>
+                        <GenericImage source={{ uri: product.image }} resizeMode={"cover"} width={dWidth * .3875} height={dWidth * .3875} />
                     </GenericView>
-                    <GenericView marginTop={dWidth * .025}>
-                        <GenericText color={colors.primary}>{product.price} ₺</GenericText>
+                    <GenericView marginTop={dWidth * .025} flexDirection='row' spaceBetween>
+                        <GenericView justifyContent='center'>
+                            <GenericText color={colors.primary}>{product.price} ₺</GenericText>
+                        </GenericView>
+                        <GenericTouchableOpacity
+                            onPress={addAndRemoveFavorite.bind(this, product.id)}
+                            justifyContent='center'
+                        >
+                            <Icon name={product.isFavorite ? 'heart' : 'heart-outline'} size={25} color={colors.primary} />
+                        </GenericTouchableOpacity>
                     </GenericView>
                     <GenericView marginTop={dWidth * .025} marginBottom={dWidth * .025}>
                         <GenericText color={colors.black}>{product.name}</GenericText>

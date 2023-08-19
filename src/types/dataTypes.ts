@@ -21,3 +21,13 @@ export interface IGenericProduct {
     "quantity": number,
     "isFavorite": boolean,
 };
+
+export interface IProductBrand {
+    "brand": string,
+    "checked": boolean
+};
+
+export interface IProductModel {
+    "model": string,
+    "checked": boolean
+};
