@@ -6,7 +6,7 @@ import AppHeader from '@/components/shared/AppHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { getProductsThunk } from '@/store/reducers';
-import { IProduct } from '@/types/dataTypes';
+import { IGenericProduct, IProduct } from '@/types/dataTypes';
 import ProductItem from '@/components/ProductItem';
 import { dWidth } from '@/constants';
 
@@ -15,7 +15,7 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const productList: IProduct[] = useSelector((state: RootState) => state.productReducer.filteredProductList || []);
+  const filteredGenericProductList: IGenericProduct[] = useSelector((state: RootState) => state.productReducer.filteredGenericProductList || []);
 
   useEffect(() => {
     getProducts();
@@ -37,10 +37,10 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
       <GenericView padding={dWidth * .0125} flex={1}>
         <FlatList
           numColumns={2}
-          data={productList}
+          data={filteredGenericProductList}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          /* onEndReached={getProducts} */
+        /* onEndReached={getProducts} */
         />
       </GenericView>
     </SafeAreaWrapper>

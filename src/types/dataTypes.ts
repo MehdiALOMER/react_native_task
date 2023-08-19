@@ -9,7 +9,15 @@ export interface IProduct {
     "createdAt": string,
 };
 
-export interface ICart {
-    "product": IProduct,
+export interface IGenericProduct {
+    "id": number,
+    "name": string,
+    "description": string,
+    "brand": string,
+    "model": string,
+    "price": number,
+    "image": string,
+    "createdAt": string,
     "quantity": number,
-}
+    "isFavorite": boolean,
+};

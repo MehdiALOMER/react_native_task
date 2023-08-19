@@ -7,7 +7,7 @@ export class ProductService {
         try {
             let response = await NetworkManager.get(ApiConstant.productsUrl);
 
-            console.log("response :::::: ", response);
+            console.log("response", response);
 
             return response;
         } catch (error) {

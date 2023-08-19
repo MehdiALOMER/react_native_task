@@ -1,4 +1,4 @@
-import { IProduct } from "@/types/dataTypes";
+import { IGenericProduct, IProduct } from "@/types/dataTypes";
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { setLoading } from "./loadingReducer";
 import { ProductService } from "@/services/productsService";
@@ -26,8 +26,10 @@ const getProductsThunk = createAsyncThunk("product/getAll", async (payload: void
 const productSlice = createSlice({
     name: "employee",
     initialState: {
-        productList: [] as IProduct[],
-        filteredProductList: [] as IProduct[],
+        /* productList: [] as IProduct[],
+        filteredProductList: [] as IProduct[], */
+        genericProductList: [] as IGenericProduct[],
+        filteredGenericProductList: [] as IGenericProduct[],
         status: "idle",
     },
     reducers: {
@@ -40,8 +42,12 @@ const productSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(getProductsThunk.fulfilled, (state, action) => {
             state.status = "success";
-            state.filteredProductList = action.payload;
-            state.productList = action.payload;
+            // listede olan her objeye quantity ve isFavorite ekleniyor
+            let array = action.payload.map((product: IProduct) => {
+                return { ...product, quantity: 1, isFavorite: false };
+            });
+            state.genericProductList = array;
+            state.filteredGenericProductList = array;
         });
     },
 
