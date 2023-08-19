@@ -1,11 +1,14 @@
-import { NavigationContainer } from "@react-navigation/native"
 import React from "react"
+import { NativeBaseProvider } from "native-base"                // Badge Kullanıldığı için eklenmiştir.
 import AppStackNavigator from "./AppStackNavigator"
+import { NavigationContainer } from "@react-navigation/native"
 
 const MainNavigator = () => {
     return (
         <NavigationContainer>
-            <AppStackNavigator />
+            <NativeBaseProvider>
+                <AppStackNavigator />
+            </NativeBaseProvider>
         </NavigationContainer>
     )
 }

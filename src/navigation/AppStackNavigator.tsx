@@ -30,7 +30,7 @@ const AppStackNavigator = () => {
                 headerShown: false
             }}
         >
-            {/* <Stack.Screen name={"StarterScreen"} component={StarterScreen} /> */}
+            <Stack.Screen name={"StarterScreen"} component={StarterScreen} />
             <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
             <Stack.Screen name={"ProductDetailScreen"} component={ProductDetailScreen} />
         </Stack.Navigator>

@@ -9,7 +9,7 @@ interface AppHeaderProps {
 	onPressMenu?: () => void;
 	back?: boolean;
 	onPressBack?: () => void;
-	title?: string;
+	title?: number | string;
 	right?: string;
 	rightComponent?: React.ReactNode;
 	onRightPress?: () => void;
@@ -52,8 +52,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 				</TouchableOpacity>
 			)}
 			{back && (
-				<TouchableOpacity onPress={onPressBack} style={{width:150 , height:26}} >
-					<Icon name="arrow-left"   size={IconSize} color={iconColor} />
+				<TouchableOpacity onPress={onPressBack} style={{ width: 150, height: 26 }} >
+					<Icon name="arrow-left" size={IconSize} color={iconColor} />
 				</TouchableOpacity>
 			)}
 		</View>
@@ -78,7 +78,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 						</TouchableOpacity>
 					)}
 					{right && (
-						<TouchableOpacity onPress={onRightPress} style={{width:40, height:26}}>
+						<TouchableOpacity onPress={onRightPress} style={{ width: 40, height: 26 }}>
 							<Icon name={right} size={IconSize} color={iconColor} />
 						</TouchableOpacity>
 					)}

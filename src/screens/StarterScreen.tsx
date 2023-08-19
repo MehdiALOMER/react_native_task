@@ -16,6 +16,8 @@ const StarterScreen: React.FC = ({ navigation }: any) => {
         console.log('cartData ::::::::: ', cartData);
 
         navigation.navigate('BottomTabNavigator', { screen: 'HomeScreen' });
+
+        StorageService.removeItem('cartData');
     }
 
 

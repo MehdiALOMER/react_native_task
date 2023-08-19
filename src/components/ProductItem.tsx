@@ -4,12 +4,12 @@ import { colors, dHeight, dWidth } from '@/constants';
 import Icon from './shared/Icons';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
-import { IProduct } from '@/types/dataTypes';
+import { IGenericProduct } from '@/types/dataTypes';
 import { addToCartThunk } from '@/store/reducers';
 
 
 interface Props {
-    product: IProduct,
+    product: IGenericProduct,
     navigation: any
 }
 
@@ -20,7 +20,7 @@ const ProductItem = ({ product, navigation }: Props) => {
     const dispatch = useDispatch<AppDispatch>();
 
 
-    const goToProductDetail = (product: IProduct) => {
+    const goToProductDetail = (product: IGenericProduct) => {
         navigation.navigate('ProductDetailScreen', { product });
     }
 
@@ -28,7 +28,7 @@ const ProductItem = ({ product, navigation }: Props) => {
         dispatch(addToCartThunk(id));
     }
     return (
-        <GenericView flex={1} backgroundColor={colors.primaryLight} width={dWidth * .45} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
+        <GenericView flex={1} backgroundColor={colors.primaryLight} width={dWidth * .45} height={dWidth * .6} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
             <GenericView padding={dWidth * .0125}>
                 <GenericTouchableOpacity
                     onPress={goToProductDetail.bind(this, product)}
@@ -43,7 +43,7 @@ const ProductItem = ({ product, navigation }: Props) => {
                         <GenericText color={colors.black}>{product.name}</GenericText>
                     </GenericView>
                 </GenericTouchableOpacity>
-                <GenericView >
+                <GenericView>
                     <GenericTouchableOpacity
                         onPress={addToCart.bind(this, product.id)}
                         backgroundColor={colors.primary} padding={dWidth * .025} center borderRadius={5}
