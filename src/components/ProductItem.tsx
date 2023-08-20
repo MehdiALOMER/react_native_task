@@ -25,7 +25,7 @@ const ProductItem = ({ product, navigation }: Props) => {
     }
 
     const addToCart = (id: number) => {
-        dispatch(addToCartThunk(id));
+        dispatch(addToCartThunk({ id, quantity: 1 }));      // quantity değeri 1 olarak gönderildi çünkü ürünü sepete eklerken default olarak 1 adet ekleniyor.
     }
     const addAndRemoveFavorite = (id: number) => {
         dispatch(addAndRemoveFavoriteThunk(id));

@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { Modal, ScrollView } from 'react-native';
 import SafeAreaWrapper from '@/components/shared/SafeAreaWrapper';
 import { GenericImage, GenericText, GenericTouchableOpacity, GenericView } from '@/assets/css';
 import AppHeader from '@/components/shared/AppHeader';
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/navigation/AppStackNavigator";
 import Icon from '@/components/shared/Icons';
-import { colors, dWidth } from '@/constants';
-import { Button } from 'native-base';
+import { colors, dHeight, dWidth } from '@/constants';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { addToCartThunk } from '@/store/reducers';
 
 
 type ProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetailScreen'>;
@@ -20,8 +22,10 @@ interface Props {
 
 const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
-    const [state, setState] = React.useState({ showZoom: false, zoomImages: [], });
-    const { zoomImages, showZoom } = state;
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [state, setState] = React.useState({ showZoom: false, zoomImages: [], quantity: 1 });
+    const { zoomImages, showZoom, quantity } = state;
 
     const onPressBack = () => {
         navigation.goBack();
@@ -37,16 +41,84 @@ const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         setState({ ...state, zoomImages });
     }, []);
 
+    // quantity değerini arttırıp azaltma
+    const increaseAndDecreaseQuantity = (type: string) => {
+        if (type === 'increase') {
+            setState({ ...state, quantity: quantity + 1 });
+        } else {
+            if (quantity > 1) {
+                setState({ ...state, quantity: quantity - 1 });
+            }
+        }
+    }
+
+    const addToCart = (id: number) => {
+        dispatch(addToCartThunk({ id, quantity }));     // quantity değeri 1 den farklı olabilir (aynı üründen birden fazla eklenmek istenebilir).
+    }
 
     return (
         <SafeAreaWrapper>
             <AppHeader back onPressBack={onPressBack} title={route.params.product.name} />
-            <GenericView>
+            <GenericView flex={1}>
                 {/* Image View */}
-                <GenericView>
+                <GenericView flex={2}>
                     <GenericTouchableOpacity onPress={() => setState({ ...state, showZoom: true })}>
-                        <GenericImage source={{ uri: route.params.product.image }} resizeMode={"cover"} width={dWidth * 1} height={200} />
+                        <GenericImage source={{ uri: route.params.product.image }} resizeMode={"cover"} width={dWidth * 1} height={dHeight * .3} />
                     </GenericTouchableOpacity>
+                </GenericView>
+
+                {/* other info */}
+                <GenericView flex={3} paddingLeft={dWidth * .02} paddingRight={dWidth * .02}>
+                    <ScrollView>
+                        <GenericView marginTop={dWidth * .02}>
+                            <GenericText bold fontSize={18} color={colors.black}>{route.params.product.name}</GenericText>
+                        </GenericView>
+                        <GenericView marginTop={dWidth * .02}>
+                            <GenericText bold fontSize={18} color={colors.primary}>{route.params.product.price} ₺</GenericText>
+                        </GenericView>
+                        <GenericView flexDirection='row' spaceBetween marginTop={dWidth * .02}>
+                            <GenericView>
+                                <GenericText bold fontSize={16} color={colors.black}>{route.params.product.brand}</GenericText>
+                            </GenericView>
+                            <GenericView>
+                                <GenericText bold fontSize={16} color={colors.black}>{route.params.product.model}</GenericText>
+                            </GenericView>
+                        </GenericView>
+                        <GenericView marginTop={dWidth * .02}>
+                            <GenericText color={colors.black}>{route.params.product.description}</GenericText>
+                        </GenericView>
+                    </ScrollView>
+                </GenericView>
+
+                {/* Add to cart */}
+                <GenericView flex={.5} borderTopWidth={1} borderTopColor={colors.primary} flexDirection='row' padding={dWidth * .02}>
+
+                    <GenericTouchableOpacity
+                        onPress={addToCart.bind(this, route.params.product.id)}
+                        flex={4} backgroundColor={colors.primary} margin={dWidth * .02} borderRadius={5} center
+                    >
+                        <GenericText bold color={colors.white}>Add to cart</GenericText>
+                    </GenericTouchableOpacity>
+                    <GenericView flex={1} backgroundColor={colors.primaryLight} margin={dWidth * .02} borderRadius={5} flexDirection='row'>
+                        <GenericView flex={1} center>
+                            <GenericText color={colors.primary} fontSize={18} bold>{quantity}</GenericText>
+                        </GenericView>
+                        <GenericView flex={1}>
+                            <GenericTouchableOpacity
+                                onPress={increaseAndDecreaseQuantity.bind(this, 'increase')}
+                                flex={1} center
+                            >
+                                <Icon name='chevron-up' size={25} color={colors.primary} />
+                            </GenericTouchableOpacity>
+                            <GenericTouchableOpacity
+                                disabled={quantity === 1}
+                                onPress={increaseAndDecreaseQuantity.bind(this, 'decrease')}
+                                flex={1} center
+                            >
+                                <Icon name='chevron-down' size={25} color={colors.primary} />
+                            </GenericTouchableOpacity>
+                        </GenericView>
+                    </GenericView>
                 </GenericView>
 
                 {/* Zoom image */}
@@ -73,76 +145,8 @@ const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
                 </Modal>
             </GenericView>
 
-
-            {/* Bottom View */}
-            {/* <View style={styles.footerView}>
-                <Button
-                    size="md"
-                    variant="solid"
-                    bg={colors.info}
-                isLoading={fetchCart}
-                style={[GlobalStyles.button, { flex: 0.70, marginHorizontal: wp('2%') }]}
-                onPress={() => !productDetail.out_of_stock ? _addToCart() : showOutofStock()}
-                >
-                    <Text style={GlobalStyles.buttonText}>Add to Cart</Text>
-                </Button>
-                <View style={styles.countBox}>
-                    <Text style={styles.countTxt}>5</Text>
-                    <View style={styles.arrowContainer}>
-                        <TouchableOpacity style={{ flex: 0.50 }} onPress={() => setState({ ...state, productCount: productCount + 1 })}>
-                            <Icon name="keyboard-arrow-up" size={20} color={colors.black} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ flex: 0.50 }} onPress={() => setState({ ...state, productCount: productCount > 1 ? productCount - 1 : 1 })}>
-                            <Icon name="keyboard-arrow-down" size={20} color={colors.black} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View> */}
         </SafeAreaWrapper>
     );
 };
 
 export default ProductDetailScreen;
-
-const styles = StyleSheet.create({
-    footerView: {
-        flexDirection: 'row',
-        backgroundColor: colors.white,
-        height: '8%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: 'grey',
-        shadowOffset: { width: 0, height: 0.4 },
-        shadowOpacity: 0.30,
-        shadowRadius: 3,
-        elevation: 6,
-        borderTopColor: colors.black,
-        borderTopWidth: 1
-    },
-    countBox: {
-        backgroundColor: colors.white,
-        flexDirection: 'row',
-        flex: 0.20,
-        height: '4.8%',
-        marginHorizontal: '1%',
-        shadowColor: 'grey',
-        shadowOffset: { width: 0, height: 0.4 },
-        shadowOpacity: 0.30,
-        shadowRadius: 3,
-        elevation: 6,
-        borderRadius: 5,
-        justifyContent: 'center'
-    },
-    countTxt: {
-        fontSize: '4.5%',
-        flex: 0.60,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        color: colors.black,
-
-    },
-    arrowContainer: {
-        flex: 0.40,
-        flexDirection: 'column',
-    }
-});

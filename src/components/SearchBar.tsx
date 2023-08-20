@@ -3,16 +3,16 @@ import React, { useState, useCallback } from 'react';
 import { Searchbar } from 'react-native-paper';
 
 interface SearchBarProps {
-    searchProductList: (query: string) => void;
+    search: (query: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchProductList }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ search }) => {
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     const onChangeSearch = useCallback((query: string) => {
         setSearchQuery(query);
-        searchProductList(query);
-    }, [searchProductList]);
+        search(query);
+    }, [search]);
 
     return (
         <Searchbar

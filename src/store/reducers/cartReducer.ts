@@ -5,26 +5,27 @@ import { Alert } from 'react-native';
 import { IGenericProduct } from '@/types/dataTypes';
 
 
-const addToCartThunk = createAsyncThunk("addToCart", async (id: number) => {
+const addToCartThunk = createAsyncThunk("addToCart", async (payload: { id: number, quantity: number }) => {
     // id ya göre ürünü productReducer taki product listesinden bul
-    let product = store.getState().productReducer.genericProductList.find((p) => p.id === id);
+    console.log("payload", payload);
+    let product = store.getState().productReducer.genericProductList.find((p) => p.id === payload.id);
 
     if (product) {
         let cartData = await StorageService.getItem("cartData");
         let data: IGenericProduct[] = [];
         if (cartData) {
             data = JSON.parse(cartData);
-            let index = data.findIndex((p) => p.id === id);
+            let index = data.findIndex((p) => p.id === payload.id);
             if (index !== -1) {
-                data[index].quantity += 1;
+                data[index].quantity += payload.quantity;
             }
             else {
-                data.push({ ...product });
+                data.push({ ...product, quantity: payload.quantity });
             }
             await StorageService.setItem("cartData", JSON.stringify(data));
         }
         else {
-            data = [{ ...product }];
+            data = [{ ...product, quantity: payload.quantity }];
             await StorageService.setItem("cartData", JSON.stringify(data));
         }
         return data;
@@ -80,7 +81,6 @@ const cartSlice = createSlice({
         setCartData: (state, action) => {
             state.cartData = action.payload;
             state.cartCount = action.payload.length;
-            state.cartTotalPrice = action.payload.reduce((acc: any, item: IGenericProduct) => acc + (item.price * item.quantity), 0);
         }
     },
     extraReducers: (builder) => {

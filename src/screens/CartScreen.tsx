@@ -37,10 +37,10 @@ const CartScreen: React.FC = ({ navigation }: any) => {
                                     keyExtractor={(item) => item.id.toString()}
                                 />
                             </GenericView>
-                            <GenericView flex={1} padding={dWidth * .02} spaceBetween>
+                            <GenericView flex={1} padding={dWidth * .02} spaceBetween borderTopWidth={1} borderTopColor={colors.primary}>
                                 <GenericView flexDirection='row' spaceBetween>
                                     <GenericView>
-                                        <GenericText bold fontSize={16}>Total:</GenericText>
+                                        <GenericText bold fontSize={16} color={colors.black}>Total:</GenericText>
                                     </GenericView><GenericView>
                                         <GenericText bold fontSize={16} color={colors.primary}>{cartTotalPrice} ₺</GenericText>
                                     </GenericView>

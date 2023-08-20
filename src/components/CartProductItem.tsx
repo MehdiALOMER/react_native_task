@@ -38,9 +38,12 @@ const CartProductItem = ({ product, navigation }: Props) => {
                     <GenericImage source={{ uri: product.image }} resizeMode={"contain"} width={dWidth * .2} height={dWidth * .2} borderRadius={5} />
                 </GenericView>
                 <GenericView flex={3} paddingLeft={dWidth * .05} paddingRight={dWidth * .05}>
-                    <GenericView flex={1}>
-                        <GenericText bold>{product.name}</GenericText>
-                    </GenericView>
+                    <GenericTouchableOpacity
+                        onPress={goToProductDetail.bind(this, product)}
+                        flex={1}
+                    >
+                        <GenericText bold color={colors.black} fontSize={16}>{product.name}</GenericText>
+                    </GenericTouchableOpacity>
                     <GenericView flex={1}>
                         <GenericText color={colors.primary} bold fontSize={dWidth * .04}>{product.price} ₺</GenericText>
                     </GenericView>

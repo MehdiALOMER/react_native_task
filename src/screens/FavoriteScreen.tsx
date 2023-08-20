@@ -18,7 +18,7 @@ const FavoriteScreen: React.FC = ({ navigation }: any) => {
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const favoriteList: IGenericProduct[] = useSelector((state: RootState) => state.productReducer.favoriteList || []);
+    const favoriteList: IGenericProduct[] = useSelector((state: RootState) => state.favoriteReducer.favoriteList || []);
 
 
 
@@ -35,10 +35,13 @@ const FavoriteScreen: React.FC = ({ navigation }: any) => {
 
 
 
+    const onPressBack = () => {
+        navigation.goBack();
+    }
 
     return (
         <SafeAreaWrapper>
-            <AppHeader title="Favorite" />
+            <AppHeader back onPressBack={onPressBack} title="Favorite" />
             <GenericView padding={dWidth * .0125} flex={1}>
                 <GenericView>
                     <FlatList

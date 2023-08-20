@@ -6,7 +6,7 @@ import AppHeader from '@/components/shared/AppHeader';
 import { StorageService } from '@/utils/storage';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
-import { getProductsThunk, setCartData } from '@/store/reducers';
+import { getProductsThunk, setCartData, setFavoriteData } from '@/store/reducers';
 
 
 const StarterScreen: React.FC = ({ navigation }: any) => {
@@ -30,6 +30,12 @@ const StarterScreen: React.FC = ({ navigation }: any) => {
         if (cartData) {
             let data = JSON.parse(cartData);
             dispatch(setCartData(data));
+        }
+
+        let favoriteData = await StorageService.getItem('favoriteData');
+        if (favoriteData) {
+            let data = JSON.parse(favoriteData);
+            dispatch(setFavoriteData(data));
         }
 
 

@@ -5,7 +5,7 @@ import { GenericText, GenericTouchableOpacity, GenericView } from '@/assets/css'
 import AppHeader from '@/components/shared/AppHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
-import { changeCheckedBrand, changeCheckedModel, changeCheckedSort, filterProducts, loadMoreProducts, searchProducts } from '@/store/reducers';
+import { changeCheckedBrand, changeCheckedModel, changeCheckedSort, filterProducts, loadMoreProducts, searchBrand, searchModel, searchProducts } from '@/store/reducers';
 import { IGenericProduct, IProduct, IProductBrand, IProductModel } from '@/types/dataTypes';
 import ProductItem from '@/components/ProductItem';
 import { colors, dHeight, dWidth } from '@/constants';
@@ -26,8 +26,8 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
 
 
   const sortChecked: string = useSelector((state: RootState) => state.productReducer.sortChecked || '');
-  const productBrandList: IProductBrand[] = useSelector((state: RootState) => state.productReducer.productBrandList || []);
-  const productModelList: IProductModel[] = useSelector((state: RootState) => state.productReducer.productModelList || []);
+  const filteredProductBrandList: IProductBrand[] = useSelector((state: RootState) => state.productReducer.filteredProductBrandList || []);
+  const filteredProductModelList: IProductModel[] = useSelector((state: RootState) => state.productReducer.filteredProductModelList || []);
 
   useEffect(() => {
 
@@ -44,8 +44,17 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
     dispatch(loadMoreProducts());
   };
 
+  // ürün arama
   const searchProductList = useCallback((query: string) => {
     dispatch(searchProducts(query));
+  }, []);
+  // marka arama
+  const searchBrandList = useCallback((query: string) => {
+    dispatch(searchBrand(query));
+  }, []);
+  // model arama
+  const searchModelList = useCallback((query: string) => {
+    dispatch(searchModel(query));
   }, []);
 
   const goFavorite = () => {
@@ -56,10 +65,10 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
   return (
     <SafeAreaWrapper>
       <AppHeader title="Home" right="heart" onRightPress={goFavorite} />
-      <GenericView padding={dWidth * .0125} flex={1}>
+      <GenericView padding={dWidth * .0125} flex={1} marginBottom={dWidth * .15}>
         <GenericView marginBottom={dWidth * .01} flexDirection='row'>
           <GenericView flex={6}>
-            <SearchBar searchProductList={searchProductList} />
+            <SearchBar search={searchProductList} />
           </GenericView>
           <GenericView flex={1} center>
             <GenericTouchableOpacity
@@ -93,12 +102,12 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
                 </GenericTouchableOpacity>
               </GenericView>
               <GenericView>
-                <GenericText fontSize={16}>Filter</GenericText>
+                <GenericText fontSize={16} color={colors.black}>Filter</GenericText>
               </GenericView>
             </GenericView>
             <GenericView flex={3} margin={dWidth * .02} borderBottomWidth={1} borderBottomColor={colors.gray}>
               <GenericView>
-                <GenericText>Sort By</GenericText>
+                <GenericText color={colors.black}>Sort By</GenericText>
               </GenericView>
               <GenericView>
                 <GenericView flexDirection='row'>
@@ -130,19 +139,6 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
                 <GenericView flexDirection='row'>
                   <GenericView center>
                     <RadioButton
-                      value="priceHighToLow"
-                      status={sortChecked === 'priceHighToLow' ? 'checked' : 'unchecked'}
-                      onPress={() => { dispatch(changeCheckedSort('priceHighToLow')) }}
-                      color={colors.primary}
-                    />
-                  </GenericView>
-                  <GenericView center>
-                    <GenericText>Price High to Low</GenericText>
-                  </GenericView>
-                </GenericView>
-                <GenericView flexDirection='row'>
-                  <GenericView center>
-                    <RadioButton
                       value="priceLowToHigh"
                       status={sortChecked === 'priceLowToHigh' ? 'checked' : 'unchecked'}
                       onPress={() => { dispatch(changeCheckedSort('priceLowToHigh')) }}
@@ -153,16 +149,32 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
                     <GenericText>Price Low to High</GenericText>
                   </GenericView>
                 </GenericView>
+                <GenericView flexDirection='row'>
+                  <GenericView center>
+                    <RadioButton
+                      value="priceHighToLow"
+                      status={sortChecked === 'priceHighToLow' ? 'checked' : 'unchecked'}
+                      onPress={() => { dispatch(changeCheckedSort('priceHighToLow')) }}
+                      color={colors.primary}
+                    />
+                  </GenericView>
+                  <GenericView center>
+                    <GenericText>Price High to Low</GenericText>
+                  </GenericView>
+                </GenericView>
               </GenericView>
             </GenericView>
             <GenericView flex={3} margin={dWidth * .02} borderBottomWidth={1} borderBottomColor={colors.gray}>
-              <GenericView>
-                <GenericText>Brand</GenericText>
+              <GenericView flex={.5}>
+                <GenericText color={colors.black}>Brand</GenericText>
               </GenericView>
-              <GenericView>
+              <GenericView flex={1}>
+                <SearchBar search={searchBrandList} />
+              </GenericView>
+              <GenericView flex={2}>
                 <ScrollView>
                   {
-                    productBrandList.map((item: IProductBrand, index: number) => {
+                    filteredProductBrandList.map((item: IProductBrand, index: number) => {
                       return (
                         <GenericView key={index} flexDirection='row'>
                           <GenericView center>
@@ -183,13 +195,16 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
               </GenericView>
             </GenericView>
             <GenericView flex={3} margin={dWidth * .02}>
-              <GenericView>
-                <GenericText>Model</GenericText>
+              <GenericView flex={.5}>
+                <GenericText color={colors.black}>Model</GenericText>
               </GenericView>
-              <GenericView>
+              <GenericView flex={1}>
+                <SearchBar search={searchModelList} />
+              </GenericView>
+              <GenericView flex={2}>
                 <ScrollView>
                   {
-                    productModelList.map((item: IProductModel, index: number) => {
+                    filteredProductModelList.map((item: IProductModel, index: number) => {
                       return (
                         <GenericView key={index} flexDirection='row'>
                           <GenericView center>
@@ -215,7 +230,7 @@ const HomeScreen: React.FC = ({ navigation }: any) => {
                   dispatch(filterProducts())
                   setState({ ...state, showModal: false })
                 }}
-                backgroundColor={colors.primary} borderRadius={5} center padding={dWidth * .02}
+                flex={1} backgroundColor={colors.primary} borderRadius={5} center padding={dWidth * .02}
               >
                 <GenericText color={colors.white} bold>Primary</GenericText>
               </GenericTouchableOpacity>

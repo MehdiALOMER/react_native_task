@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { setLoading } from "./loadingReducer";
 import { ProductService } from "@/services/productsService";
 import { StorageService } from "@/utils/storage";
+import { Alert } from "react-native";
 
 
 const getProductsThunk = createAsyncThunk("product/getAll", async (payload: void, { dispatch }) => {
@@ -12,46 +13,35 @@ const getProductsThunk = createAsyncThunk("product/getAll", async (payload: void
     let response = await ProductService.getProducts();
 
     if (response?.status === 200) {
+
+        let favoriteData = await StorageService.getItem('favoriteData');
+        let array: IGenericProduct[] = [];
+        if (favoriteData) {
+            let data = JSON.parse(favoriteData);
+            array = response?.data.map((product: IProduct) => {
+                let index = data.findIndex((p: IGenericProduct) => p.id === product.id);
+                if (index !== -1) {
+                    return { ...product, quantity: 1, isFavorite: true };
+                }
+                else {
+                    return { ...product, quantity: 1, isFavorite: false };
+                }
+            });
+        }
+        else {
+            array = response.data.map((product: IProduct) => {
+                return { ...product, quantity: 1, isFavorite: false };
+            });
+        }
+
         dispatch(setLoading(false));
-        return response?.data;
+        return array;
     }
     else {
         dispatch(setLoading(false));
         return Promise.reject(response);
     }
 });
-
-const addAndRemoveFavoriteThunk = createAsyncThunk("addAndRemoveFavoriteThunk", async (id: number) => {
-
-    let product = productSlice.getInitialState().genericProductList.find((item) => item.id === id);
-
-    if (product) {
-        let favoriteData = await StorageService.getItem("favoriteData");
-        let data: IGenericProduct[] = [];
-        if (favoriteData) {
-            data = JSON.parse(favoriteData);
-            let index = data.findIndex((p) => p.id === id);
-            if (index !== -1) {
-                data.splice(index, 1);
-            }
-            else {
-                data.push({ ...product });
-            }
-            await StorageService.setItem("favoriteData", JSON.stringify(data));
-        }
-        else {
-            data = [{ ...product }];
-            await StorageService.setItem("favoriteData", JSON.stringify(data));
-        }
-        return data;
-    }
-    else {
-        return [];
-    }
-
-});
-
-
 
 
 
@@ -68,10 +58,9 @@ const productSlice = createSlice({
         // filtereleme seçenekleri
         sortChecked: "oldToNew" as string,                  // sıralama seçeneği
         productBrandList: [] as IProductBrand[],            // ürün markaları (sadece farklı olanlar)
+        filteredProductBrandList: [] as IProductBrand[],    // filtrelenmiş ürün markaları (arama için)
         productModelList: [] as IProductModel[],            // ürün modelleri (sadece farklı olanlar)
-
-
-        favoriteList: [] as IGenericProduct[],              // favori ürün listesi
+        filteredProductModelList: [] as IProductModel[],    // filtrelenmiş ürün modelleri (arama için)
 
 
         status: "idle",
@@ -81,28 +70,45 @@ const productSlice = createSlice({
             state.displayedProducts = state.filteredGenericProductList.slice(0, state.currentPage * state.productsPerPage + state.productsPerPage);
             state.currentPage++;
         },
+        // ürün listesi içerisinde arama
         searchProducts: (state, action) => {
             state.filteredGenericProductList = state.genericProductList.filter((product) => product.name.toLocaleLowerCase().includes(action.payload.toLocaleLowerCase()));
             state.displayedProducts = state.filteredGenericProductList.slice(0, 12);
+        },
+        // brand liste içerisinde arama
+        searchBrand: (state, action) => {
+            state.filteredProductBrandList = state.productBrandList.filter((brand) => brand.brand.toLocaleLowerCase().includes(action.payload.toLocaleLowerCase()));
+        },
+        // model liste içerisinde arama
+        searchModel: (state, action) => {
+            state.filteredProductModelList = state.productModelList.filter((model) => model.model.toLocaleLowerCase().includes(action.payload.toLocaleLowerCase()));
         },
         changeCheckedSort: (state, action) => {
             state.sortChecked = action.payload;
         },
         changeCheckedBrand: (state, action) => {
             let brandList = state.productBrandList;
+            let filteredBrandList = state.filteredProductBrandList;
             let brand = brandList.find((item) => item.brand === action.payload);
-            if (brand) {
+            let filteredBrand = filteredBrandList.find((item) => item.brand === action.payload);
+            if (brand && filteredBrand) {
                 brand.checked = !brand.checked;
+                filteredBrand.checked = !filteredBrand.checked;
             }
             state.productBrandList = brandList;
+            state.filteredProductBrandList = filteredBrandList;
         },
         changeCheckedModel: (state, action) => {
             let modelList = state.productModelList;
+            let filteredModelList = state.filteredProductModelList;
             let model = modelList.find((item) => item.model === action.payload);
-            if (model) {
+            let filteredModel = filteredModelList.find((item) => item.model === action.payload);
+            if (model && filteredModel) {
                 model.checked = !model.checked;
+                filteredModel.checked = !filteredModel.checked;
             }
             state.productModelList = modelList;
+            state.filteredProductModelList = filteredModelList;
         },
         // filtreleme işlemi eğer marka veya model seçilmişse ona göre yapılıyor yoksa tüm ürünler gösteriliyor ve sırada seçilen sıralama seçeneğine göre sıralama yapılıyor
         filterProducts: (state) => {
@@ -110,6 +116,8 @@ const productSlice = createSlice({
             let modelList = state.productModelList.filter((item) => item.checked);
             let sortChecked = state.sortChecked;
             let filteredList = state.genericProductList;
+
+
             if (brandList.length > 0) {
                 filteredList = filteredList.filter((product) => brandList.some((item) => item.brand === product.brand));
             }
@@ -122,59 +130,69 @@ const productSlice = createSlice({
             else if (sortChecked === "newToOld") {
                 filteredList = filteredList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             }
-            else if (sortChecked === "lowToHigh") {
+            else if (sortChecked === "priceLowToHigh") {
                 filteredList = filteredList.sort((a, b) => a.price - b.price);
             }
-            else if (sortChecked === "highToLow") {
+            else if (sortChecked === "priceHighToLow") {
                 filteredList = filteredList.sort((a, b) => b.price - a.price);
             }
             state.filteredGenericProductList = filteredList;
             state.displayedProducts = filteredList.slice(0, 12);
             state.currentPage = 1;
+        },
+        // ilgili ürünün favori durumunu değiştirme (genericProductList, filteredGenericProductList ve displayedProducts listelerinde değişiklik yapılıyor ve yeni listeler set ediliyor) 
+        changeFavorite: (state, action) => {
+            let id = action.payload;
+            /* let product = state.genericProductList.find((product) => product.id === id);
+            let filteredProduct = state.filteredGenericProductList.find((product) => product.id === id); */
+            let displayedProduct = state.displayedProducts.find((product) => product.id === id);
+            if (/* product && filteredProduct &&  */displayedProduct) {
+                /* product.isFavorite = !product.isFavorite;
+                filteredProduct.isFavorite = !filteredProduct.isFavorite; */
+                displayedProduct.isFavorite = !displayedProduct.isFavorite;
+                /* state.genericProductList = [...state.genericProductList];
+                state.filteredGenericProductList = [...state.filteredGenericProductList]; */
+                state.displayedProducts = [...state.displayedProducts];
+            }
         }
     },
     extraReducers: (builder) => {
         builder.addCase(getProductsThunk.fulfilled, (state, action) => {
             state.status = "success";
-            // listede olan her objeye quantity ve isFavorite ekleniyor
-            let array = action.payload.map((product: IProduct) => {
-                return { ...product, quantity: 1, isFavorite: false };
-            });
-            state.genericProductList = array;
-            state.filteredGenericProductList = array;
+            state.genericProductList = action.payload;
+            state.filteredGenericProductList = action.payload;
             // sadece ilk 12 ürün gösteriliyor
-            state.displayedProducts = array.slice(0, 12);
+            state.displayedProducts = action.payload.slice(0, 12);
             state.currentPage = 1;
 
             // ürün markaları listesi oluşturuluyor
             let brandList: IProductBrand[] = [];
-            array.forEach((product: IGenericProduct) => {
+            action.payload.forEach((product: IGenericProduct) => {
                 let brand = product.brand;
                 if (!brandList.some((item) => item.brand === brand)) {
                     brandList.push({ brand, checked: false });
                 }
             });
             state.productBrandList = brandList;
+            state.filteredProductBrandList = brandList;
             // ürün modelleri listesi oluşturuluyor
             let modelList: IProductModel[] = [];
-            array.forEach((product: IGenericProduct) => {
+            action.payload.forEach((product: IGenericProduct) => {
                 let model = product.model;
                 if (!modelList.some((item) => item.model === model)) {
                     modelList.push({ model, checked: false });
                 }
             });
             state.productModelList = modelList;
-        });
-        builder.addCase(addAndRemoveFavoriteThunk.fulfilled, (state, action) => {
-            state.favoriteList = action.payload;
+            state.filteredProductModelList = modelList;
         });
     },
 
 });
 
 
-export const { loadMoreProducts, searchProducts, changeCheckedSort, changeCheckedBrand, changeCheckedModel, filterProducts } = productSlice.actions;
+export const { loadMoreProducts, searchProducts, searchBrand, searchModel, changeCheckedSort, changeCheckedBrand, changeCheckedModel, filterProducts, changeFavorite } = productSlice.actions;
 
-export { getProductsThunk, addAndRemoveFavoriteThunk };
+export { getProductsThunk };
 
 export default productSlice.reducer;
