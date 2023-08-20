@@ -1,14 +1,13 @@
 import { StorageService } from '@/utils/storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import store from '..';
 import { Alert } from 'react-native';
 import { IGenericProduct } from '@/types/dataTypes';
 import { changeFavorite } from './productReducer';
 
 
-const addAndRemoveFavoriteThunk = createAsyncThunk("addAndRemoveFavoriteThunk", async (id: number, { dispatch }) => {
+const addAndRemoveFavoriteThunk = createAsyncThunk("addAndRemoveFavoriteThunk", async (payload: { id: number, productList: IGenericProduct[] }, { dispatch }) => {
 
-    let product = store.getState().productReducer.genericProductList.find((p) => p.id === id);
+    let product = payload.productList.find((p) => p.id === payload.id);
 
     if (product) {
         dispatch(changeFavorite(product.id));
@@ -17,7 +16,7 @@ const addAndRemoveFavoriteThunk = createAsyncThunk("addAndRemoveFavoriteThunk", 
         let data: IGenericProduct[] = [];
         if (favoriteData) {
             data = JSON.parse(favoriteData);
-            let index = data.findIndex((p) => p.id === id);
+            let index = data.findIndex((p) => p.id === payload.id);
             if (index !== -1) {
                 data.splice(index, 1);
             }

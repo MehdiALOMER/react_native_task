@@ -1,14 +1,12 @@
 import { StorageService } from '@/utils/storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import store from '..';
 import { Alert } from 'react-native';
 import { IGenericProduct } from '@/types/dataTypes';
 
 
-const addToCartThunk = createAsyncThunk("addToCart", async (payload: { id: number, quantity: number }) => {
+const addToCartThunk = createAsyncThunk("addToCart", async (payload: { id: number, quantity: number, productList: IGenericProduct[] }) => {
     // id ya göre ürünü productReducer taki product listesinden bul
-    console.log("payload", payload);
-    let product = store.getState().productReducer.genericProductList.find((p) => p.id === payload.id);
+    let product = payload.productList.find((p) => p.id === payload.id);
 
     if (product) {
         let cartData = await StorageService.getItem("cartData");
@@ -75,29 +73,30 @@ const cartSlice = createSlice({
     initialState: {
         cartCount: 0,
         cartData: [] as IGenericProduct[],
-        cartTotalPrice: 0 as number
+        cartTotalPrice: "0" as string
     },
     reducers: {
         setCartData: (state, action) => {
             state.cartData = action.payload;
             state.cartCount = action.payload.length;
+            state.cartTotalPrice = action.payload.reduce((acc: any, item: IGenericProduct) => acc + (item.price * item.quantity), 0).toFixed(2);
         }
     },
     extraReducers: (builder) => {
         builder.addCase(addToCartThunk.fulfilled, (state, action) => {
             state.cartData = action.payload;
             state.cartCount = action.payload.length;
-            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
         });
         builder.addCase(increaseAndDecreaseQuantityThunk.fulfilled, (state, action) => {
             state.cartData = action.payload;
             state.cartCount = action.payload.length;
-            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
         });
         builder.addCase(deleteFromCartThunk.fulfilled, (state, action) => {
             state.cartData = action.payload;
             state.cartCount = action.payload.length;
-            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            state.cartTotalPrice = action.payload.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
         });
     }
 });

@@ -15,7 +15,7 @@ import CartProductItem from '@/components/CartProductItem';
 const CartScreen: React.FC = ({ navigation }: any) => {
 
     const cartData: IGenericProduct[] = useSelector((state: RootState) => state.cartReducer.cartData || []);
-    const cartTotalPrice: number = useSelector((state: RootState) => state.cartReducer.cartTotalPrice || 0);
+    const cartTotalPrice: string = useSelector((state: RootState) => state.cartReducer.cartTotalPrice || "0");
 
 
     const renderItem = ({ item }: { item: IGenericProduct }) => {
@@ -30,17 +30,17 @@ const CartScreen: React.FC = ({ navigation }: any) => {
                 {
                     cartData.length !== 0 ?
                         <GenericView flex={1}>
-                            <GenericView flex={7}>
+                            <GenericView flex={7} padding={dWidth * .0125}>
                                 <FlatList
                                     data={cartData}
                                     renderItem={renderItem}
                                     keyExtractor={(item) => item.id.toString()}
                                 />
                             </GenericView>
-                            <GenericView flex={1} padding={dWidth * .02} spaceBetween borderTopWidth={1} borderTopColor={colors.primary}>
+                            <GenericView flex={1} backgroundColor={colors.primaryLight} padding={dWidth * .02} spaceBetween borderTopWidth={1} borderTopColor={colors.primary}>
                                 <GenericView flexDirection='row' spaceBetween>
                                     <GenericView>
-                                        <GenericText bold fontSize={16} color={colors.black}>Total:</GenericText>
+                                        <GenericText bold fontSize={16} color={colors.black} >Total:</GenericText>
                                     </GenericView><GenericView>
                                         <GenericText bold fontSize={16} color={colors.primary}>{cartTotalPrice} ₺</GenericText>
                                     </GenericView>
@@ -49,7 +49,7 @@ const CartScreen: React.FC = ({ navigation }: any) => {
                                     onPress={() => { }}
                                     backgroundColor={colors.primary} borderRadius={5} center padding={dWidth * .02}
                                 >
-                                    <GenericText color={colors.white} bold>Complete</GenericText>
+                                    <GenericText color={colors.white} bold fontSize={16}>Complete</GenericText>
                                 </GenericTouchableOpacity>
                             </GenericView>
                         </GenericView>

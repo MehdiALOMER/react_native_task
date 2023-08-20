@@ -8,9 +8,10 @@ import { RootStackParamList } from "@/navigation/AppStackNavigator";
 import Icon from '@/components/shared/Icons';
 import { colors, dHeight, dWidth } from '@/constants';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
 import { addToCartThunk } from '@/store/reducers';
+import { IGenericProduct } from '@/types/dataTypes';
 
 
 type ProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetailScreen'>;
@@ -23,6 +24,8 @@ interface Props {
 const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
     const dispatch = useDispatch<AppDispatch>();
+
+    const genericProductList: IGenericProduct[] = useSelector((state: RootState) => state.productReducer.genericProductList || []);
 
     const [state, setState] = React.useState({ showZoom: false, zoomImages: [], quantity: 1 });
     const { zoomImages, showZoom, quantity } = state;
@@ -53,7 +56,7 @@ const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }
 
     const addToCart = (id: number) => {
-        dispatch(addToCartThunk({ id, quantity }));     // quantity değeri 1 den farklı olabilir (aynı üründen birden fazla eklenmek istenebilir).
+        dispatch(addToCartThunk({ id, quantity, productList: genericProductList }));     // quantity değeri 1 den farklı olabilir (aynı üründen birden fazla eklenmek istenebilir).
     }
 
     return (

@@ -143,15 +143,19 @@ const productSlice = createSlice({
         // ilgili ürünün favori durumunu değiştirme (genericProductList, filteredGenericProductList ve displayedProducts listelerinde değişiklik yapılıyor ve yeni listeler set ediliyor) 
         changeFavorite: (state, action) => {
             let id = action.payload;
-            /* let product = state.genericProductList.find((product) => product.id === id);
-            let filteredProduct = state.filteredGenericProductList.find((product) => product.id === id); */
+            let product = state.genericProductList.find((product) => product.id === id);
+            if (product) {
+                product.isFavorite = !product.isFavorite;
+                state.genericProductList = [...state.genericProductList];
+            }
+            let filteredProduct = state.filteredGenericProductList.find((product) => product.id === id);
+            if (filteredProduct) {
+                filteredProduct.isFavorite = !filteredProduct.isFavorite;
+                state.filteredGenericProductList = [...state.filteredGenericProductList];
+            }
             let displayedProduct = state.displayedProducts.find((product) => product.id === id);
-            if (/* product && filteredProduct &&  */displayedProduct) {
-                /* product.isFavorite = !product.isFavorite;
-                filteredProduct.isFavorite = !filteredProduct.isFavorite; */
+            if (displayedProduct) {
                 displayedProduct.isFavorite = !displayedProduct.isFavorite;
-                /* state.genericProductList = [...state.genericProductList];
-                state.filteredGenericProductList = [...state.filteredGenericProductList]; */
                 state.displayedProducts = [...state.displayedProducts];
             }
         }

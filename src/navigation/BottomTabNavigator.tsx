@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { HomeScreen } from '@/screens';
@@ -8,6 +9,7 @@ import { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { Badge } from 'native-base';
 import { GenericView } from '@/assets/css';
+import { useNavigationContainerRef } from '@react-navigation/native';
 
 
 const BottomTab = createMaterialBottomTabNavigator();
@@ -18,27 +20,43 @@ export default function BottomTabNavigator() {
 
     const cartCount = useSelector((state: RootState) => state.cartReducer.cartCount || 0);
 
+    const barColors = {
+        home: colors.primary,
+        cart: colors.black
+    };
+
+    const [tab, setTab] = React.useState<keyof typeof barColors>('home');
+    const navRef = useNavigationContainerRef();
+    React.useEffect(() => {
+        const unsubscribe = navRef.addListener('state', () => {
+          const currRoute = navRef.getCurrentRoute();
+          if (currRoute) {
+            // A work-around to set background color for the bar after the ripple
+            // effect completes. The 200 ms delay comes from trial and error
+            setTimeout(() => setTab(currRoute.name as keyof typeof barColors), 200);
+          }
+        });
+        return unsubscribe;
+      });
+
+
     return (
         <BottomTab.Navigator
             initialRouteName="HomeScreen"
-            labeled={false}
+            shifting={true}
+            activeColor={colors.white}
             barStyle={{
-                backgroundColor: colors.primary,
-               /*  borderTopWidth: 2,
-                borderTopColor: colors.primary */
-            }}
-            screenOptions={{
-
+                backgroundColor: barColors[tab]
             }}
         >
             <BottomTab.Screen
                 name="HomeScreen"
                 component={HomeScreen}
                 options={{
+                    tabBarColor: barColors.home,
+                    tabBarLabel: 'Home',
                     tabBarIcon: ({ focused }) => (
-                        <GenericView>
-                            <Icon name="home" size={35} color={focused == true ? colors.white : colors.gray} />
-                        </GenericView>
+                        <Icon name="home" size={35} color={focused == true ? colors.white : colors.gray} />
                     )
                 }}
             />
@@ -47,9 +65,11 @@ export default function BottomTabNavigator() {
                 component={CartScreen}
                 options={{
                     tabBarBadge: cartCount > 0 ? cartCount : false,
+                    tabBarColor: barColors.cart,
+                    tabBarLabel: 'Cart',
                     tabBarIcon: ({ focused }) => (
-                        <GenericView>
-                            <Icon name="cart" size={35} color={focused == true ? colors.white : colors.gray}  />
+                        <>
+                            <Icon name="cart" size={35} color={focused == true ? colors.white : colors.gray} />
                             {/* {
                                 cartCount > 0 &&
                                 <Badge
@@ -66,8 +86,7 @@ export default function BottomTabNavigator() {
                                     <Text style={[styles.badgeText, { fontSize: cartCount > 9 ? dWidth * 0.025 : dWidth * 0.03 }]}>{cartCount}</Text>
                                 </Badge>
                             } */}
-
-                        </GenericView>
+                        </>
                     )
                 }}
             />

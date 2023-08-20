@@ -45,22 +45,22 @@ const CartProductItem = ({ product, navigation }: Props) => {
                         <GenericText bold color={colors.black} fontSize={16}>{product.name}</GenericText>
                     </GenericTouchableOpacity>
                     <GenericView flex={1}>
-                        <GenericText color={colors.primary} bold fontSize={dWidth * .04}>{product.price} ₺</GenericText>
+                        <GenericText color={colors.primary} bold fontSize={16}>{product.price} ₺</GenericText>
                     </GenericView>
                     <GenericView flex={1} flexDirection='row'>
                         <GenericTouchableOpacity
                             disabled={product.quantity === 1}
                             onPress={increaseAndDecreaseQuantity.bind(this, 'decrease')}
                             center>
-                            <Icon name="minus" size={15} color={colors.black} />
+                            <Icon name="minus" size={20} color={colors.black} />
                         </GenericTouchableOpacity>
                         <GenericView center>
-                            <GenericText color={colors.black} bold> {product.quantity} </GenericText>
+                            <GenericText color={colors.black} bold > {product.quantity} </GenericText>
                         </GenericView>
                         <GenericTouchableOpacity
                             onPress={increaseAndDecreaseQuantity.bind(this, 'increase')}
                             center>
-                            <Icon name="plus" size={15} color={colors.black} />
+                            <Icon name="plus" size={20} color={colors.black} />
                         </GenericTouchableOpacity>
                     </GenericView>
                 </GenericView>

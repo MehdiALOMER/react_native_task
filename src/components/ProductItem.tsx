@@ -2,8 +2,8 @@ import React from 'react'
 import { GenericImage, GenericText, GenericTouchableOpacity, GenericView } from '@/assets/css'
 import { colors, dHeight, dWidth } from '@/constants';
 import Icon from './shared/Icons';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
 import { IGenericProduct } from '@/types/dataTypes';
 import { addAndRemoveFavoriteThunk, addToCartThunk } from '@/store/reducers';
 
@@ -19,16 +19,18 @@ const ProductItem = ({ product, navigation }: Props) => {
 
     const dispatch = useDispatch<AppDispatch>();
 
+    const genericProductList: IGenericProduct[] = useSelector((state: RootState) => state.productReducer.genericProductList || []);
+
 
     const goToProductDetail = (product: IGenericProduct) => {
         navigation.navigate('ProductDetailScreen', { product });
     }
 
     const addToCart = (id: number) => {
-        dispatch(addToCartThunk({ id, quantity: 1 }));      // quantity değeri 1 olarak gönderildi çünkü ürünü sepete eklerken default olarak 1 adet ekleniyor.
+        dispatch(addToCartThunk({ id, quantity: 1, productList: genericProductList }));         // quantity değeri 1 olarak gönderildi çünkü ürünü sepete eklerken default olarak 1 adet ekleniyor.
     }
     const addAndRemoveFavorite = (id: number) => {
-        dispatch(addAndRemoveFavoriteThunk(id));
+        dispatch(addAndRemoveFavoriteThunk({ id, productList: genericProductList }));
     }
     return (
         <GenericView backgroundColor={colors.primaryLight} margin={dWidth * .0125} padding={dWidth * .025} borderRadius={5}>
@@ -41,7 +43,7 @@ const ProductItem = ({ product, navigation }: Props) => {
                     </GenericView>
                     <GenericView marginTop={dWidth * .025} flexDirection='row' spaceBetween>
                         <GenericView justifyContent='center'>
-                            <GenericText color={colors.primary}>{product.price} ₺</GenericText>
+                            <GenericText color={colors.primary} fontSize={16} bold>{product.price} ₺</GenericText>
                         </GenericView>
                         <GenericTouchableOpacity
                             onPress={addAndRemoveFavorite.bind(this, product.id)}
@@ -51,7 +53,7 @@ const ProductItem = ({ product, navigation }: Props) => {
                         </GenericTouchableOpacity>
                     </GenericView>
                     <GenericView marginTop={dWidth * .025} marginBottom={dWidth * .025}>
-                        <GenericText color={colors.black}>{product.name}</GenericText>
+                        <GenericText color={colors.black} fontSize={16} bold numberOfLines={1}>{product.name.length > 15 ? product.name.substring(0, 15) + '...' : product.name}</GenericText>
                     </GenericView>
                 </GenericTouchableOpacity>
                 <GenericView>
@@ -59,7 +61,7 @@ const ProductItem = ({ product, navigation }: Props) => {
                         onPress={addToCart.bind(this, product.id)}
                         backgroundColor={colors.primary} padding={dWidth * .025} center borderRadius={5}
                     >
-                        <GenericText color={colors.white}>Add to Cart</GenericText>
+                        <GenericText color={colors.white} fontSize={16} bold>Add to Cart</GenericText>
                     </GenericTouchableOpacity>
                 </GenericView>
             </GenericView>

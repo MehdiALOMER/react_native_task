@@ -1,8 +1,5 @@
 import React, { useEffect } from 'react';
-
-import SafeAreaWrapper from '@/components/shared/SafeAreaWrapper';
-import { GenericText } from '@/assets/css';
-import AppHeader from '@/components/shared/AppHeader';
+import Lottie from 'lottie-react-native'
 import { StorageService } from '@/utils/storage';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
@@ -15,16 +12,15 @@ const StarterScreen: React.FC = ({ navigation }: any) => {
 
     useEffect(() => {
         getProducts();
-        checkCartData();
+        checkLocalStorage();
     }, []);
+
     const getProducts = () => {
         dispatch(getProductsThunk());
     };
 
-    const checkCartData = async () => {
-
-
-        navigation.navigate('BottomTabNavigator', { screen: 'HomeScreen' });
+    // Check if there is any data in local storage and set it to redux store
+    const checkLocalStorage = async () => {
 
         let cartData = await StorageService.getItem('cartData');
         if (cartData) {
@@ -38,16 +34,14 @@ const StarterScreen: React.FC = ({ navigation }: any) => {
             dispatch(setFavoriteData(data));
         }
 
+        navigation.navigate('BottomTabNavigator', { screen: 'HomeScreen' });
 
         /* StorageService.removeItem('cartData'); */
     }
 
 
     return (
-        <SafeAreaWrapper>
-            <AppHeader title="StarterScreen" />
-            <GenericText>StarterScreen</GenericText>
-        </SafeAreaWrapper>
+        <Lottie source={require('../assets/lottie/loading.json')} autoPlay loop />
     );
 };
 
